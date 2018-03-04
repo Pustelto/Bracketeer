@@ -1,14 +1,14 @@
 - swap quotes/brackets '`" a {([
-    - find neares q. or b. and cycle through them
-    - work on multiple selections
-    - swap for specific or cycle - zatím udělám cyklování, potom menu se selekcí
-    - remove quotes/brackets (closest)
-    - až budu mít funkcionalitu pro závorky, udělat to i pro qoutes
-    - implementovat selekci (unitř b/q, spolu s b/q a pak dále stále expanduji)
+    [x] find neares b. and cycle through them
+    [ ] work on multiple selections
+        - buggy behaivior if we have real selection, not just cursor (probably brackets in selection are included as well)
+    [ ] swap for specific
+        - create menu for selection
+    [ ] remove quotes/brackets (closest)
+    [ ] až budu mít funkcionalitu pro závorky, udělat to i pro qoutes
+    [ ] implementovat selekci (unitř b/q, spolu s b/q a pak dále stále expanduji)
 
 If I reverse beforeText, can I get result faster? (will look for brackets from the end of the string)
-
-Will break in case brackets in the code are wrong (different opening and closing b.)
 
 # bracketeer README
 
@@ -41,7 +41,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Swapping of brackets won't work in this case: `['(', '[', '{']`, string brackets inside will confuse extension as it will try to evaluate them as well. Thus giving wrong unexpected results. Generaly you will get wrong results if you try to swap upaired brackets.
 
 ## Release Notes
 
@@ -58,20 +58,3 @@ Fixed issue #.
 ### 1.1.0
 
 Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**

@@ -13,7 +13,7 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    let putoSwitchQuotes = vscode.commands.registerCommand('bracketeer.swapBrackets', function () {
+    let putoSwitchQuotes = vscode.commands.registerTextEditorCommand('bracketeer.swapBrackets', function (textEditor, edit) {
         if (!vscode.window.activeTextEditor) return;
 
         // const quotes = [`'`, `"`, '`'];
@@ -77,6 +77,8 @@ function activate(context) {
                 }
             })
 
+            if (location === undefined) return;
+
             // Najdi uzavírací závorku
             const endingRes = {
                 '(': /[\(\)]/g,
@@ -85,10 +87,10 @@ function activate(context) {
             }
 
             let closingBPos
+            const pairs = []
 
             while ((b = endingRes[type].exec(afterText)) !== null) {
                 const token = b[0]
-                const pairs = []
 
                 if (type === token) {
                     pairs.push(b.index)
@@ -102,22 +104,31 @@ function activate(context) {
                 }
             }
 
-            replaceTokens(type, location, closingBPos)
+            replaceTokens(edit, type, getOpenPosition(location), getClosePosition(s, closingBPos))
         })
 
-        function replaceTokens(type, startPos, endPos, target) {
-            /*
-                - získám pozice open/close závorek - snadno můžu udělat vnitří či vnější selekci
-            - udělat selekci a editaci
-                - když mám selekci, tak už je jedno jestli měním závorky nebo mažu závorky
-                - u selekce je také jedno, co nahrazuji čím (závorky, úvozovky), to by mělo jít nastavit v parametru
-                */
+        function replaceTokens(edit, type, startPos, endPos, target) {
+            const o = type === '(' ? '[' : type === '[' ? '{' : '('
+            const e = type === '(' ? ']' : type === '[' ? '}' : ')'
 
-                           // loc je od začátku dokumentu, closingBPos je počet znaků od kurzoru
-            console.log('result: ', type, startPos, endPos);
+            edit.replace(charRange(startPos), o)
+            edit.replace(charRange(endPos), e)
         }
 
-        function getSelectionPosition() {}
+        // Taken from quick swap plugin? (TODO: fill correct inspiration)
+        function charRange(p) {
+            let end_pos = new vscode.Position(p.line, p.character + 1);
+            return new vscode.Selection(p, end_pos)
+          }
+
+        function getOpenPosition(offset) {
+            return editor.document.positionAt(offset)
+        }
+
+        function getClosePosition(selection, offset) {
+            const d = editor.document
+            return d.positionAt(d.offsetAt(selection.end) + offset)
+        }
 
         /*
         - selekce závorek na dané pozici (open a close)
