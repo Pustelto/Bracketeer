@@ -1,0 +1,77 @@
+{
+    "name": "bracketeer",
+    "displayName": "Bracketeer",
+    "description": "Easy switching of brackets and quotes",
+    "version": "0.0.1",
+    "publisher": "pustelto",
+    "engines": {
+        "vscode": "^1.19.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:bracketeer.swapQuotes",
+        "onCommand:bracketeer.removeQuotes",
+        "onCommand:bracketeer.swapBrackets",
+        "onCommand:bracketeer.removeBrackets"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "keybindings": [
+            {
+                "command": "bracketeer.swapQuotes",
+                "key": "",
+                "mac": ""
+            },
+            {
+                "command": "bracketeer.removeQuotes",
+                "key": "",
+                "mac": ""
+            },
+            {
+                "command": "bracketeer.swapBrackets",
+                "key": "",
+                "mac": ""
+            },
+            {
+                "command": "bracketeer.removeBrackets",
+                "key": "",
+                "mac": ""
+            }
+        ],
+        "commands": [
+            {
+                "command": "bracketeer.swapQuotes",
+                "title": "Swap quotes",
+                "category": "Bracketeer"
+            },
+            {
+                "command": "bracketeer.removeQuotes",
+                "title": "Remove quotes",
+                "category": "Bracketeer"
+            },
+            {
+                "command": "bracketeer.swapBrackets",
+                "title": "Swap brackets",
+                "category": "Bracketeer"
+            },
+            {
+                "command": "bracketeer.removeBrackets",
+                "title": "Remove brackets",
+                "category": "Bracketeer"
+            }
+        ]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "eslint": "^4.6.1",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42"
+    }
+}
