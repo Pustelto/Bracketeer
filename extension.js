@@ -35,7 +35,7 @@ function activate(context) {
             const end = new vscode.Position(docLines + 1, 0);
 
             const startRange = new vscode.Range(start, s.start)
-            const endRange = editor.document.validateRange(new vscode.Range(s.start, end))
+            const endRange = editor.document.validateRange(new vscode.Range(s.end, end))
 
             const beforeText = editor.document.getText(startRange);
             const afterText = editor.document.getText(endRange);
@@ -79,7 +79,7 @@ function activate(context) {
 
             if (location === undefined) return;
 
-            // Najdi uzavírací závorku
+            // Find closing bracket
             const endingRes = {
                 '(': /[\(\)]/g,
                 '[': /[\[\]]/g,

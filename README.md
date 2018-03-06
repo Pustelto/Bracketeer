@@ -1,14 +1,18 @@
-- swap quotes/brackets '`" a {([
-    [x] find neares b. and cycle through them
-    [ ] work on multiple selections
-        - buggy behaivior if we have real selection, not just cursor (probably brackets in selection are included as well)
-    [ ] swap for specific
-        - create menu for selection
-    [ ] remove quotes/brackets (closest)
-    [ ] až budu mít funkcionalitu pro závorky, udělat to i pro qoutes
-    [ ] implementovat selekci (unitř b/q, spolu s b/q a pak dále stále expanduji)
+[x] find neares b. and cycle through them
+[x] prepare test enviroment
+[ ] write tests for existing functions
+[x] work on multiple selections
+    [x] buggy behaivior if we have real selection, not just cursor (probably brackets in selection are included as well)
+[ ] remove quotes/brackets (closest)
+[ ] swap for specific
+    - create menu for selection
+[~] add shortcuts (keybindings) for commands
+[ ] refactor and clean the code
+[ ] až budu mít funkcionalitu pro závorky, udělat to i pro qoutes
+[ ] implementovat selekci (unitř b/q, spolu s b/q a pak dále stále expanduji)
 
 If I reverse beforeText, can I get result faster? (will look for brackets from the end of the string)
+- zjistím jestli, u kurzoru je závorka a případně jaký typ - podle toho budu hledat druhou do páru, případně hledám nejbližší na obou stranách
 
 # bracketeer README
 
