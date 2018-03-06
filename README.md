@@ -3,7 +3,7 @@
 [ ] write tests for existing functions
 [x] work on multiple selections
     [x] buggy behaivior if we have real selection, not just cursor (probably brackets in selection are included as well)
-[ ] remove quotes/brackets (closest)
+[x] remove quotes/brackets (closest)
 [ ] swap for specific
     - create menu for selection
 [~] add shortcuts (keybindings) for commands
