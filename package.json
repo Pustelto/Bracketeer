@@ -31,8 +31,8 @@
             },
             {
                 "command": "bracketeer.swapBrackets",
-                "key": "",
-                "mac": ""
+                "key": "Shift+Ctrl+Alt+K",
+                "mac": "Shift+Cmd+Alt+K"
             },
             {
                 "command": "bracketeer.removeBrackets",
