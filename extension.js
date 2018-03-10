@@ -317,15 +317,121 @@ function activate(context) {
         })
     });
 
+    let bracketeerSelectBracketContent = vscode.commands.registerCommand('bracketeer.selectBracketContent', function () {
+        if (!vscode.window.activeTextEditor) return;
+
+        // const quotes = [`'`, `"`, '`'];
+        const bracketsRe = /[\(\)\[\]\{\}]/g;
+        // const openersRe = /[\(\[\{]/g;
+        // const endersRe = /[\)\]\}]/g;
+
+        const editor = vscode.window.activeTextEditor;
+        const sel = editor.selections
+
+        // TODO: arrow function replace with separate function which can be tested - pure f.
+        // TODO: This should return array af results for better modularity and reusability
+        editor.selections = sel.map(s => {
+            const texts = [];
+            const docLines = editor.document.lineCount;
+
+            // TODO: check if cursor is on bracket - for a less work
+
+            const start = new vscode.Position(0, 0);
+            const end = new vscode.Position(docLines + 1, 0);
+
+            const startRange = new vscode.Range(start, s.start)
+            const endRange = editor.document.validateRange(new vscode.Range(s.end, end))
+
+            const beforeText = editor.document.getText(startRange);
+            const afterText = editor.document.getText(endRange);
+
+            const brackets = {
+                '(': [],
+                '[': [],
+                '{': [],
+            }
+
+            const enders = {
+                ')': '(',
+                ']': '[',
+                '}': '{',
+            }
+
+            let b = []
+
+            while ((b = bracketsRe.exec(beforeText)) !== null) {
+                const token = b[0]
+
+                // remove last bracket when closing bracket encountered
+                if ( [')', ']', '}'].includes(token) ) {
+                    brackets[enders[token]].pop()
+                } else {
+                    brackets[token].push(b.index)
+                }
+            }
+
+            let type, location, last
+
+            ['(', '[', '{'].forEach(t => {
+                const lastIndex = brackets[t].length ? brackets[t].length - 1 : 0
+
+                if (last === undefined || (brackets[t].length && last < brackets[t][lastIndex])) {
+                    last = brackets[t][lastIndex]
+                    location = brackets[t][lastIndex]
+                    type = t
+                }
+            })
+
+            if (location === undefined) return;
+
+            // Find closing bracket
+            const endingRes = {
+                '(': /[\(\)]/g,
+                '[': /[\[\]]/g,
+                '{': /[\{\}]/g,
+            }
+
+            let closingBPos
+            const pairs = []
+
+            while ((b = endingRes[type].exec(afterText)) !== null) {
+                const token = b[0]
+
+                if (type === token) {
+                    pairs.push(b.index)
+                } else {
+                    if (pairs.length === 0) {
+                        closingBPos = b.index;
+                        break;
+                    }
+
+                    pairs.pop()
+                }
+            }
+
+            return contentSelection(getOpenPosition(location), getClosePosition(s, closingBPos), s)
+        })
+    });
+
     /*
-    This should work universally for:
-        - cycling (get some bracket and receive next in line)
-        - specific change (don't care what bracket, but change to specified one)
-        - deletion - same as specific bracket (but will change to empty string)
-        - bracketes or quotes
+        - vytvořím selekci od počátečního do koncového tokenu
+        - pokud je selekce na hranici tokenů - expanduji ji na tokeny
+        - u závorek pokračuji stále dál, u quotes násobnou selekci nedělám (nastavit jako příznak ve funkci)
      */
+    function contentSelection(startPos, endPos, originalSelection) {
+        const {start, end} = originalSelection
+        const selStart = new vscode.Position(startPos.line, startPos.character + 1)
+
+        // If current selection is same as new created one we will expand ti include brackets/quotes as well
+        if ( start.isEqual(selStart) && end.isEqual(endPos) ) {
+            return new vscode.Selection(startPos, new vscode.Position(endPos.line, endPos.character + 1))
+        }
+
+        return new vscode.Selection(selStart, endPos)
+    }
+
     function replaceTokens(startPos, endPos, tokenType, target) {
-        vscode.window.activeTextEditor.edit(eB => {
+        vscode.window.activeTextEditor.edit(edit => {
             let o
             let e
 
@@ -342,6 +448,7 @@ function activate(context) {
                     e = target[1]
                 }
             } else {
+                // cycling via findIndex instead of nested ifs?
                 // const brackets = '([{)]}'
                 // const quotes = '\'"`'
 
@@ -349,8 +456,8 @@ function activate(context) {
                 e = tokenType === '(' ? ']' : tokenType === '[' ? '}' : ')'
             }
 
-            eB.replace(charRange(startPos), o)
-            eB.replace(charRange(endPos), e)
+            edit.replace(charRange(startPos), o)
+            edit.replace(charRange(endPos), e)
         })
     }
 
@@ -376,6 +483,7 @@ function activate(context) {
     context.subscriptions.push(bracketeerSwapBrackets);
     context.subscriptions.push(bracketeerChangeBracketsTo);
     context.subscriptions.push(bracketeerRemoveBrackets);
+    context.subscriptions.push(bracketeerSelectBracketContent);
 }
 exports.activate = activate;
 

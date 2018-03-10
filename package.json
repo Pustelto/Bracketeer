@@ -1,7 +1,7 @@
 {
     "name": "bracketeer",
     "displayName": "Bracketeer",
-    "description": "Easy switching of brackets and quotes",
+    "description": "Easy manipulation with brackets and quotes",
     "version": "0.0.1",
     "publisher": "pustelto",
     "engines": {
@@ -15,13 +15,19 @@
         "onCommand:bracketeer.removeQuotes",
         "onCommand:bracketeer.swapBrackets",
         "onCommand:bracketeer.changeBracketsTo",
-        "onCommand:bracketeer.removeBrackets"
+        "onCommand:bracketeer.removeBrackets",
+        "onCommand:bracketeer.selectBracketContent"
     ],
     "main": "./extension",
     "contributes": {
         "keybindings": [
             {
                 "command": "bracketeer.swapQuotes",
+                "key": "",
+                "mac": ""
+            },
+            {
+                "command": "bracketeer.changeQuotesTo",
                 "key": "",
                 "mac": ""
             },
@@ -44,11 +50,21 @@
                 "command": "bracketeer.removeBrackets",
                 "key": "Shift+Ctrl+Alt+I",
                 "mac": "Shift+Cmd+Alt+I"
+            },
+            {
+                "command": "bracketeer.selectBracketContent",
+                "key": "Shift+Ctrl+Alt+h",
+                "mac": "Shift+Cmd+Alt+h"
             }
         ],
         "commands": [
             {
                 "command": "bracketeer.swapQuotes",
+                "title": "Swap quotes",
+                "category": "Bracketeer"
+            },
+            {
+                "command": "bracketeer.changeQuotesTo",
                 "title": "Swap quotes",
                 "category": "Bracketeer"
             },
@@ -70,6 +86,11 @@
             {
                 "command": "bracketeer.removeBrackets",
                 "title": "Remove brackets",
+                "category": "Bracketeer"
+            },
+            {
+                "command": "bracketeer.selectBracketContent",
+                "title": "Select bracket content",
                 "category": "Bracketeer"
             }
         ]
