@@ -13,7 +13,7 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    let bracketeerSwapBrackets = vscode.commands.registerTextEditorCommand('bracketeer.swapBrackets', function (textEditor, edit) {
+    let bracketeerSwapBrackets = vscode.commands.registerCommand('bracketeer.swapBrackets', function () {
         if (!vscode.window.activeTextEditor) return;
 
         // const quotes = [`'`, `"`, '`'];
@@ -78,7 +78,10 @@ function activate(context) {
                 }
             })
 
-            if (location === undefined) return;
+            if (location === undefined) {
+                vscode.window.showInformationMessage('No bracket found.')
+                return;
+            }
 
             // Find closing bracket
             const endingRes = {
@@ -105,12 +108,17 @@ function activate(context) {
                 }
             }
 
-            replaceTokens(edit, getOpenPosition(location), getClosePosition(s, closingBPos), type)
+            if (closingBPos === undefined) {
+                vscode.window.showInformationMessage('No corresponding closing bracket found.')
+                return;
+            }
+
+            replaceTokens(getOpenPosition(location), getClosePosition(s, closingBPos), type)
         })
 
     });
 
-    let bracketeerRemoveBrackets = vscode.commands.registerTextEditorCommand('bracketeer.removeBrackets', function (textEditor, edit) {
+    let bracketeerRemoveBrackets = vscode.commands.registerCommand('bracketeer.removeBrackets', function () {
         if (!vscode.window.activeTextEditor) return;
 
         // const quotes = [`'`, `"`, '`'];
@@ -202,7 +210,110 @@ function activate(context) {
                 }
             }
 
-            replaceTokens(edit, getOpenPosition(location), getClosePosition(s, closingBPos), type, '')
+            replaceTokens(getOpenPosition(location), getClosePosition(s, closingBPos), type, '')
+        })
+    });
+
+    let bracketeerChangeBracketsTo = vscode.commands.registerCommand('bracketeer.changeBracketsTo', async function () {
+        if (!vscode.window.activeTextEditor) return;
+
+        // const quotes = [`'`, `"`, '`'];
+        const bracketsRe = /[\(\)\[\]\{\}]/g;
+        // const openersRe = /[\(\[\{]/g;
+        // const endersRe = /[\)\]\}]/g;
+
+        const editor = vscode.window.activeTextEditor;
+        const sel = editor.selections
+
+        const menuItems = [
+            {label: '()', description: 'Change to parenthesis', detail: 'detail text'},
+            {label: '[]', description: 'next to label Change to square brackets', detail: 'detail text below label'},
+            {label: '{}', description: 'Change to curly brackets'},
+        ]
+        const option = await vscode.window.showQuickPick(menuItems, {matchOnDescription: true, placeHolder: 'Select bracket type you want to switch to...', ignoreFocusOut: true})
+
+        // TODO: arrow function replace with separate function which can be tested - pure f.
+        // TODO: This should return array af results for better modularity and reusability
+        sel.forEach(s => {
+            const texts = [];
+            const docLines = editor.document.lineCount;
+
+            // TODO: check if cursor is on bracket - for a less work
+
+            const start = new vscode.Position(0, 0);
+            const end = new vscode.Position(docLines + 1, 0);
+
+            const startRange = new vscode.Range(start, s.start)
+            const endRange = editor.document.validateRange(new vscode.Range(s.end, end))
+
+            const beforeText = editor.document.getText(startRange);
+            const afterText = editor.document.getText(endRange);
+
+            const brackets = {
+                '(': [],
+                '[': [],
+                '{': [],
+            }
+
+            const enders = {
+                ')': '(',
+                ']': '[',
+                '}': '{',
+            }
+
+            let b = []
+
+            while ((b = bracketsRe.exec(beforeText)) !== null) {
+                const token = b[0]
+
+                // remove last bracket when closing bracket encountered
+                if ( [')', ']', '}'].includes(token) ) {
+                    brackets[enders[token]].pop()
+                } else {
+                    brackets[token].push(b.index)
+                }
+            }
+
+            let type, location, last
+
+            ['(', '[', '{'].forEach(t => {
+                const lastIndex = brackets[t].length ? brackets[t].length - 1 : 0
+
+                if (last === undefined || (brackets[t].length && last < brackets[t][lastIndex])) {
+                    last = brackets[t][lastIndex]
+                    location = brackets[t][lastIndex]
+                    type = t
+                }
+            })
+
+            if (location === undefined) return;
+
+            // Find closing bracket
+            const endingRes = {
+                '(': /[\(\)]/g,
+                '[': /[\[\]]/g,
+                '{': /[\{\}]/g,
+            }
+
+            let closingBPos
+            const pairs = []
+
+            while ((b = endingRes[type].exec(afterText)) !== null) {
+                const token = b[0]
+
+                if (type === token) {
+                    pairs.push(b.index)
+                } else {
+                    if (pairs.length === 0) {
+                        closingBPos = b.index;
+                        break;
+                    }
+
+                    pairs.pop()
+                }
+            }
+
+            replaceTokens(getOpenPosition(location), getClosePosition(s, closingBPos), type, option.label)
         })
     });
 
@@ -213,32 +324,34 @@ function activate(context) {
         - deletion - same as specific bracket (but will change to empty string)
         - bracketes or quotes
      */
-    function replaceTokens(edit, startPos, endPos, tokenType, target) {
-        let o
-        let e
+    function replaceTokens(startPos, endPos, tokenType, target) {
+        vscode.window.activeTextEditor.edit(eB => {
+            let o
+            let e
 
-        if (target !== undefined) {
-            if (target.length !== 2 || target.length !== 0 || typeof target !== string) {
-                new Error ('Target must by string of length 2 for token replacment or empty string for token deletion')
-            }
+            if (target !== undefined) {
+                if (target.length !== 2 || target.length !== 0 || typeof target !== string) {
+                    new Error ('Target must by string of length 2 for token replacment or empty string for token deletion')
+                }
 
-            if (target.length === 0) {
-                o = ''
-                e = ''
+                if (target.length === 0) {
+                    o = ''
+                    e = ''
+                } else {
+                    o = target[0]
+                    e = target[1]
+                }
             } else {
-                o = target[0]
-                e = target[1]
+                // const brackets = '([{)]}'
+                // const quotes = '\'"`'
+
+                o = tokenType === '(' ? '[' : tokenType === '[' ? '{' : '('
+                e = tokenType === '(' ? ']' : tokenType === '[' ? '}' : ')'
             }
-        } else {
-            // const brackets = '([{)]}'
-            // const quotes = '\'"`'
 
-            o = tokenType === '(' ? '[' : tokenType === '[' ? '{' : '('
-            e = tokenType === '(' ? ']' : tokenType === '[' ? '}' : ')'
-        }
-
-        edit.replace(charRange(startPos), o)
-        edit.replace(charRange(endPos), e)
+            eB.replace(charRange(startPos), o)
+            eB.replace(charRange(endPos), e)
+        })
     }
 
     // Taken from quick swap plugin? (TODO: fill correct inspiration)
@@ -261,6 +374,7 @@ function activate(context) {
     }
 
     context.subscriptions.push(bracketeerSwapBrackets);
+    context.subscriptions.push(bracketeerChangeBracketsTo);
     context.subscriptions.push(bracketeerRemoveBrackets);
 }
 exports.activate = activate;
