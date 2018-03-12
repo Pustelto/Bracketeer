@@ -1,8 +1,8 @@
 {
     "name": "bracketeer",
     "displayName": "Bracketeer",
-    "description": "Easy manipulation with brackets and quotes",
-    "version": "0.0.1",
+    "description": "Easy manipulation with brackets",
+    "version": "1.0.0",
     "publisher": "pustelto",
     "engines": {
         "vscode": "^1.19.0"
@@ -11,8 +11,6 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:bracketeer.swapQuotes",
-        "onCommand:bracketeer.removeQuotes",
         "onCommand:bracketeer.swapBrackets",
         "onCommand:bracketeer.changeBracketsTo",
         "onCommand:bracketeer.removeBrackets",
@@ -21,21 +19,6 @@
     "main": "./extension",
     "contributes": {
         "keybindings": [
-            {
-                "command": "bracketeer.swapQuotes",
-                "key": "",
-                "mac": ""
-            },
-            {
-                "command": "bracketeer.changeQuotesTo",
-                "key": "",
-                "mac": ""
-            },
-            {
-                "command": "bracketeer.removeQuotes",
-                "key": "",
-                "mac": ""
-            },
             {
                 "command": "bracketeer.swapBrackets",
                 "key": "Shift+Ctrl+Alt+K",
@@ -58,21 +41,6 @@
             }
         ],
         "commands": [
-            {
-                "command": "bracketeer.swapQuotes",
-                "title": "Swap quotes",
-                "category": "Bracketeer"
-            },
-            {
-                "command": "bracketeer.changeQuotesTo",
-                "title": "Swap quotes",
-                "category": "Bracketeer"
-            },
-            {
-                "command": "bracketeer.removeQuotes",
-                "title": "Remove quotes",
-                "category": "Bracketeer"
-            },
             {
                 "command": "bracketeer.swapBrackets",
                 "title": "Swap brackets",
