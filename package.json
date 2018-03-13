@@ -3,13 +3,27 @@
     "displayName": "Bracketeer",
     "description": "Easy manipulation with brackets",
     "version": "1.0.0",
-    "publisher": "pustelto",
+    "publisher": "Tomas Pustelnik",
+    "homepage": "https://github.com/Pustelto/Bracketeer/blob/master/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Pustelto/Bracketeer"
+    },
+    "license": "MIT",
     "engines": {
         "vscode": "^1.19.0"
     },
     "categories": [
         "Other"
     ],
+    "keywords": [
+        "Brackets", "Parentheses"
+    ],
+    "icon": "images/bracketeer_logo.png",
+    "galleryBanner": {
+        "color": "#2386CF",
+        "theme": "dark",
+    },
     "activationEvents": [
         "onCommand:bracketeer.swapBrackets",
         "onCommand:bracketeer.changeBracketsTo",

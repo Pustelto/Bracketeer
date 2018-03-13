@@ -2,6 +2,8 @@
 
 Bracketeer gives you brackets superpowers at the tip of your fingers. Easily swap bracket types, remove brackets or select their content from withing the brackets with one command. No need to select content of the bracket or move your cursor. Works even on multiple selections.
 
+Feedback and PRs are welcome. Enjoy the plugin.
+
 ## Features
 
 Bracketeer currently provide four commands to manipulate with brackets. All commands work on multiple selections as well.
