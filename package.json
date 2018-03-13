@@ -3,7 +3,7 @@
     "displayName": "Bracketeer",
     "description": "Easy manipulation with brackets",
     "version": "1.0.0",
-    "publisher": "Tomas Pustelnik",
+    "publisher": "pustelto",
     "homepage": "https://github.com/Pustelto/Bracketeer/blob/master/README.md",
     "repository": {
         "type": "git",
@@ -22,7 +22,7 @@
     "icon": "images/bracketeer_logo.png",
     "galleryBanner": {
         "color": "#2386CF",
-        "theme": "dark",
+        "theme": "dark"
     },
     "activationEvents": [
         "onCommand:bracketeer.swapBrackets",

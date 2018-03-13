@@ -49,6 +49,7 @@ Same goes for quotes, so be aware of some edge cases.
     - Explore posibility to use Prism npm module for crude universal parsing (inspiration from [Subtle Match Brackets](https://marketplace.visualstudio.com/items?itemName=rafamel.subtle-brackets))
 - Possible optimalization by detecting if cursor is on searched token, smarter way how to parse brackets
 - Selection from cursor to opening/closing bracket/quote
+- Cursor navigation to brackets/quotes
 
 ## Release Notes
 
