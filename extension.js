@@ -7,13 +7,8 @@ function activate(context) {
         COMMANDS DEFINITIONS
      */
     context.subscriptions.push(vscode.commands.registerCommand(
-        'bracketeer.swapBrackets', () => {
-            console.log('start', new Date());
-
-            replaceTokens(parseBrackets())
-            console.log('end', new Date());
-        })
-    );
+        'bracketeer.swapBrackets', () => replaceTokens(parseBrackets())
+    ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
         'bracketeer.removeBrackets', () => replaceTokens(parseBrackets(), '')
@@ -54,7 +49,7 @@ function activate(context) {
     ));
 
     /*
-        HELPER FUNCTION
+        CORE FUNCTIONALITY
      */
     function parseBrackets() {
         if (!vscode.window.activeTextEditor) return;
@@ -101,35 +96,34 @@ function activate(context) {
             */
 
 
-           // TODO: arrow function replace with separate function which can be tested - pure f.
+        // TODO: arrow function replace with separate function which can be tested - pure f.
         const allResults = selections.map(s => {
             const texts = [];
             const docLines = editor.document.lineCount;
             const docStart = new vscode.Position(0, 0);
             const docEnd = new vscode.Position(docLines + 1, 0);
 
-            // Helpers
+            // HELPERS
             // We use javascript as default lang if parsed doc is not in language defined in Prism
             const getParseLanguage = langId => Prism.languages[langId] || Prism.languages['javascript']
             const getLastFromArray = (arr) => arr[arr.length - 1]
             const isStringToken = (token) => token.type === 'string' || typeof token === 'string'
+            // pos is either 'start' or 'end'
+            const getRangePosition = (selection, pos) =>
+                editor.document.getWordRangeAtPosition(s[pos])
+                    ? editor.document.getWordRangeAtPosition(s[pos])[pos]
+                    : s[pos]
 
             let beforeRangeEnd, afterRangeStart
 
             // Get word borders for selection in order to split doc text on these borders
             if (s.start.isEqual(s.end)) {
-                // When the cursor is not at word function return undefined
-                const startWord = editor.document.getWordRangeAtPosition(s.start) || s.start
-
-                beforeRangeEnd = startWord.start || startWord
-                afterRangeStart = startWord.start || startWord
+                beforeRangeEnd = getRangePosition(s, 'start')
+                afterRangeStart = getRangePosition(s, 'start')
             } else {
                 // When the cursor is not at word function return undefined
-                const startWord = editor.document.getWordRangeAtPosition(s.start) || s.start
-                const endWord = editor.document.getWordRangeAtPosition(s.end) || s.end
-
-                beforeRangeEnd = startWord.start || startWord
-                afterRangeStart = endWord.end || endWord
+                beforeRangeEnd = getRangePosition(s, 'start')
+                afterRangeStart = getRangePosition(s, 'end')
             }
 
             // Get vscode range for text before selection and for text after selection...
@@ -166,63 +160,37 @@ function activate(context) {
                 '[': [],
                 '{': [],
             }
-            // let b = []
-            // let last
 
             let i = tokenizedBeforeText.length - 1;
-            let bOff = 0;
+            let beforeOffset = 0;
 
             while (i >= 0) {
-                bOff += tokenizedBeforeText[i].length
-                const content = tokenizedBeforeText[i].content
-                const punct = tokenizedBeforeText[i].type === 'punctuation' && ['(', '[', '{', ')', ']', '}'].indexOf(content) >= 0
+                const tokenContent = tokenizedBeforeText[i].content
+                const isBracket = tokenizedBeforeText[i].type === 'punctuation' &&
+                    '()[]{}'.indexOf(tokenContent) >= 0
 
-                if (punct) {
-                    if (['(', '[', '{'].includes(content) && !brackets[content].length ) {
-                        openPos = bOff
-                        bracketType = content
+                beforeOffset += tokenizedBeforeText[i].length
+
+                if (isBracket) {
+                    if (['(', '[', '{'].includes(tokenContent) && !brackets[tokenContent].length ) {
+                        openPos = beforeOffset
+                        bracketType = tokenContent
                         break;
-                    }
-
-                    if (['(', '[', '{'].includes(content) && brackets[content].length ) {
-                        brackets[content].pop()
-                    }
-
-                    if ([')', ']', '}'].includes(content)) {
-                        brackets[ENDERS[content]].push(content)
+                    } else {
+                        ['(', '[', '{'].includes(tokenContent)
+                            ? brackets[tokenContent].pop()
+                            : brackets[ENDERS[tokenContent]].push(tokenContent)
                     }
                 }
 
                 i--;
             }
 
-            // // Collect all unclosed brackets before selection
-            // while ((b = bracketsRe.exec(beforeText)) !== null) {
-            //     const token = b[0]
-
-            //     // remove last bracket when closing bracket encountered
-            //     if ( [')', ']', '}'].includes(token) ) {
-            //         brackets[ENDERS[token]].pop()
-            //     } else {
-            //         brackets[token].push(b.index)
-            //     }
-            // }
-
-            // // Get last unclosed bracket (closest to the selection)
-            // ['(', '[', '{'].forEach(t => {
-            //     const lastIndex = brackets[t].length ? brackets[t].length - 1 : 0
-
-            //     if (last === undefined || (brackets[t].length && last < brackets[t][lastIndex])) {
-            //         last = brackets[t][lastIndex]
-            //         openPos = brackets[t][lastIndex]
-            //         bracketType = t
-            //     }
-            // })
-
             if (openPos === undefined) return;
 
+            // Parse closing bracket
             let j = 0;
-            let eOff = 0;
+            let afterOffset = 0;
             const pairs = []
 
             const B_PAIRS = {
@@ -232,57 +200,31 @@ function activate(context) {
             }
 
             while (j < tokenizedAfterText.length) {
-                const content = tokenizedAfterText[j].content
-                const punct = tokenizedAfterText[j].type === 'punctuation' && B_PAIRS[bracketType].indexOf(content) >= 0
+                const tokenContent = tokenizedAfterText[j].content
+                const isCorrectBracketType = tokenizedAfterText[j].type === 'punctuation' &&
+                    B_PAIRS[bracketType].indexOf(tokenContent) >= 0
 
-                if (punct) {
-                    if ([')', ']', '}'].includes(content) && !pairs.length ) {
-                        closePos = eOff
+                if (isCorrectBracketType) {
+                    if ([')', ']', '}'].includes(tokenContent) && !pairs.length ) {
+                        closePos = afterOffset
                         break;
-                    }
-
-                    if ([')', ']', '}'].includes(content) && pairs.length ) {
-                        pairs.pop()
-                    }
-
-                    if (['(', '[', '{'].includes(content)) {
-                        pairs.push(content)
+                    } else {
+                        [')', ']', '}'].includes(tokenContent)
+                            ? pairs.pop()
+                            : pairs.push(tokenContent)
                     }
                 }
 
-                eOff += tokenizedAfterText[j].length
+                afterOffset += tokenizedAfterText[j].length
+
                 j++;
             }
-
-            // Parse closing bracket
-            // const endingRes = {
-            //     '(': /[\(\)]/g,
-            //     '[': /[\[\]]/g,
-            //     '{': /[\{\}]/g,
-            // }
-            // const pairs = []
-
-            // // Get first closing bracket of given type
-            // while ((b = endingRes[bracketType].exec(afterText)) !== null) {
-            //     const token = b[0]
-
-            //     if (bracketType === token) {
-            //         pairs.push(b.index)
-            //     } else {
-            //         if (pairs.length === 0) {
-            //             closePos = b.index;
-            //             break;
-            //         }
-
-            //         pairs.pop()
-            //     }
-            // }
 
             if (closePos === undefined) return;
 
             return {
-                startPos: getOpenPosition(beforeRangeEnd, openPos),
-                endPos: getClosePosition(afterRangeStart, closePos),
+                startPos: getPositionFromOffset(beforeRangeEnd, openPos, true),
+                endPos: getPositionFromOffset(afterRangeStart, closePos, false),
                 tokenType: bracketType,
                 originalSelection: s,
             }
@@ -330,10 +272,6 @@ function activate(context) {
                         e = target[1]
                     }
                 } else {
-                    // cycling via findIndex instead of nested ifs?
-                    // const brackets = '([{)]}'
-                    // const quotes = '\'"`'
-
                     o = tokenType === '(' ? '[' : tokenType === '[' ? '{' : '('
                     e = tokenType === '(' ? ']' : tokenType === '[' ? '}' : ')'
                 }
@@ -350,18 +288,12 @@ function activate(context) {
         return new vscode.Selection(p, end_pos)
       }
 
-    function getOpenPosition(start, offset) {
+    function getPositionFromOffset(position, offset, before = true) {
         const editor = vscode.window.activeTextEditor;
         const d = editor.document
+        const delta = before ? offset : offset * -1
 
-        return d.positionAt(d.offsetAt(start) - offset)
-    }
-
-    function getClosePosition(end, offset) {
-        const editor = vscode.window.activeTextEditor;
-        const d = editor.document
-
-        return d.positionAt(d.offsetAt(end) + offset)
+        return d.positionAt(d.offsetAt(position) - delta)
     }
 }
 
