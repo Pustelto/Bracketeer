@@ -17,7 +17,8 @@
         "Other"
     ],
     "keywords": [
-        "Brackets", "Parentheses"
+        "Brackets",
+        "Parentheses"
     ],
     "icon": "images/bracketeer_logo.png",
     "galleryBanner": {
@@ -82,10 +83,14 @@
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
-        "eslint": "^4.6.1",
+        "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "eslint": "^4.6.1",
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6"
+    },
+    "dependencies": {
+        "prism-languages": "0.4.0",
+        "prismjs": "1.12.2"
     }
 }

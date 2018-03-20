@@ -1,12 +1,19 @@
 const vscode = require('vscode');
+const Prism = require('prismjs');
+const languages = require('prism-languages');
 
 function activate(context) {
     /*
         COMMANDS DEFINITIONS
      */
     context.subscriptions.push(vscode.commands.registerCommand(
-        'bracketeer.swapBrackets', () => replaceTokens(parseBrackets())
-    ));
+        'bracketeer.swapBrackets', () => {
+            console.log('start', new Date());
+
+            replaceTokens(parseBrackets())
+            console.log('end', new Date());
+        })
+    );
 
     context.subscriptions.push(vscode.commands.registerCommand(
         'bracketeer.removeBrackets', () => replaceTokens(parseBrackets(), '')
@@ -53,24 +60,97 @@ function activate(context) {
         if (!vscode.window.activeTextEditor) return;
 
         const editor = vscode.window.activeTextEditor;
-        const sel = editor.selections
+        const languageId = editor.document.languageId;
+        const selections = editor.selections;
 
         const bracketsRe = /[\(\)\[\]\{\}]/g;
 
-        // TODO: arrow function replace with separate function which can be tested - pure f.
-        const allResults = sel.map(s => {
+        /*
+        - zjistím pozici počátku slova na počátku selekce a z této pozice udělám split na before/afterText
+        - parsování stringů bude podobné jako u brackets (zvážit nahrazení pouze internals současné parseBrackets funkce)
+        - od počátku slova zjistím, zda je před kurzorem string - pokud je před kurzorem celý string, je dost možné, že za kurzorem je kromě pokračování kurzu konec stringu (např závorky) a toto se teď snžím zkonvertovat na string - pokud na kurzor vložím uvozovky, je to v cajku, ale nevím jaké.
+
+        otestovat parsing na nějakém větším template literalu
+
+        PROBLÉM BUDOU STRINGY - POKUD MÁM KURZOR UPROSTŘED STRINGU TAK MI TO STRING SPLITNE A PŘESTANO HO TO BRÁT JAKO STRING
+            - BUĎ PARSOVAT CELÝ DOKUMENT (FUJ) NEBO TO ZKUSIT NĚJAK NARAFIČIT - PŘIDAT SPRÁVNOU UVOZOVKU DO ZBYTKU STRINGU A PAK S NÍ NEPOČÍTAT?
+            - pokud budu mít v parsingu správně string objekt, tak mi úprava úvozovek vrátí undefined, nutno ošetřit
+
+        - délka stringu je i s uvozovkami
+
+        42:Object
+            type:"string"
+            content:"'}'"
+            length:3
+            greedy:true
+        33:Object
+            type:"template-string"
+            content:Array[1]
+                0:Object
+                    type:"string"
+                    content:"`Target must by string' of length 2 for token replacment or empty string for token deletion`"
+                    length:92
+                    greedy:false
+            length:92
+            greedy:true
+        84:Object
+            type:"punctuation"
+            content:"}"
+            length:1
+            greedy:false
+            */
+
+
+           // TODO: arrow function replace with separate function which can be tested - pure f.
+        const allResults = selections.map(s => {
             const texts = [];
             const docLines = editor.document.lineCount;
             const docStart = new vscode.Position(0, 0);
             const docEnd = new vscode.Position(docLines + 1, 0);
 
+            // Helpers
+            // We use javascript as default lang if parsed doc is not in language defined in Prism
+            const getParseLanguage = langId => Prism.languages[langId] || Prism.languages['javascript']
+            const getLastFromArray = (arr) => arr[arr.length - 1]
+            const isStringToken = (token) => token.type === 'string' || typeof token === 'string'
+
+            let beforeRangeEnd, afterRangeStart
+
+            // Get word borders for selection in order to split doc text on these borders
+            if (s.start.isEqual(s.end)) {
+                // When the cursor is not at word function return undefined
+                const startWord = editor.document.getWordRangeAtPosition(s.start) || s.start
+
+                beforeRangeEnd = startWord.start || startWord
+                afterRangeStart = startWord.start || startWord
+            } else {
+                // When the cursor is not at word function return undefined
+                const startWord = editor.document.getWordRangeAtPosition(s.start) || s.start
+                const endWord = editor.document.getWordRangeAtPosition(s.end) || s.end
+
+                beforeRangeEnd = startWord.start || startWord
+                afterRangeStart = endWord.end || endWord
+            }
+
             // Get vscode range for text before selection and for text after selection...
-            const startRange = new vscode.Range(docStart, s.start)
-            const endRange = editor.document.validateRange(new vscode.Range(s.end, docEnd))
+            const beforeRange = new vscode.Range(docStart, beforeRangeEnd)
+            const afterRange = editor.document.validateRange(new vscode.Range(afterRangeStart, docEnd))
 
             // ... and use them to get correcponding texts
-            const beforeText = editor.document.getText(startRange);
-            const afterText = editor.document.getText(endRange);
+            const beforeText = editor.document.getText(beforeRange);
+            const afterText = editor.document.getText(afterRange);
+
+            // get type of quote
+            // const quoteType = beforeTok[beforeTok.length - 1].type === 'string' || typeof beforeTok[beforeTok.length - 1] === 'string' ? beforeTok[beforeTok.length - 1].content[0] : ''
+
+            // Inserting quote is necessary for correct parsing, we then need to substract 1 from position.
+            // console.log(beforeTok[beforeTok.length - 1][0], beforeTok[beforeTok.length - 1][0] + afterText);
+            // console.log(quoteType, quoteType + afterText);
+            // code below handle quote addition for better string parsing
+            // const tokenizedAfterText = Prism.tokenize(tokenizedBeforeText[tokenizedBeforeText.length - 1][0] + afterText, getParseLanguage(languageId))
+
+            const tokenizedBeforeText = Prism.tokenize(beforeText, getParseLanguage(languageId))
+            const tokenizedAfterText = Prism.tokenize(afterText, getParseLanguage(languageId))
 
             // Helper variables
             const ENDERS = {
@@ -86,63 +166,123 @@ function activate(context) {
                 '[': [],
                 '{': [],
             }
-            let b = []
-            let last
+            // let b = []
+            // let last
 
-            // Collect all unclosed brackets before selection
-            while ((b = bracketsRe.exec(beforeText)) !== null) {
-                const token = b[0]
+            let i = tokenizedBeforeText.length - 1;
+            let bOff = 0;
 
-                // remove last bracket when closing bracket encountered
-                if ( [')', ']', '}'].includes(token) ) {
-                    brackets[ENDERS[token]].pop()
-                } else {
-                    brackets[token].push(b.index)
-                }
-            }
+            while (i >= 0) {
+                bOff += tokenizedBeforeText[i].length
+                const content = tokenizedBeforeText[i].content
+                const punct = tokenizedBeforeText[i].type === 'punctuation' && ['(', '[', '{', ')', ']', '}'].indexOf(content) >= 0
 
-            // Get last unclosed bracket (closest to the selection)
-            ['(', '[', '{'].forEach(t => {
-                const lastIndex = brackets[t].length ? brackets[t].length - 1 : 0
-
-                if (last === undefined || (brackets[t].length && last < brackets[t][lastIndex])) {
-                    last = brackets[t][lastIndex]
-                    openPos = brackets[t][lastIndex]
-                    bracketType = t
-                }
-            })
-
-            if (openPos === undefined) return;
-
-            // Parse closing bracket
-            const endingRes = {
-                '(': /[\(\)]/g,
-                '[': /[\[\]]/g,
-                '{': /[\{\}]/g,
-            }
-            const pairs = []
-
-            // Get first closing bracket of given type
-            while ((b = endingRes[bracketType].exec(afterText)) !== null) {
-                const token = b[0]
-
-                if (bracketType === token) {
-                    pairs.push(b.index)
-                } else {
-                    if (pairs.length === 0) {
-                        closePos = b.index;
+                if (punct) {
+                    if (['(', '[', '{'].includes(content) && !brackets[content].length ) {
+                        openPos = bOff
+                        bracketType = content
                         break;
                     }
 
-                    pairs.pop()
+                    if (['(', '[', '{'].includes(content) && brackets[content].length ) {
+                        brackets[content].pop()
+                    }
+
+                    if ([')', ']', '}'].includes(content)) {
+                        brackets[ENDERS[content]].push(content)
+                    }
                 }
+
+                i--;
             }
+
+            // // Collect all unclosed brackets before selection
+            // while ((b = bracketsRe.exec(beforeText)) !== null) {
+            //     const token = b[0]
+
+            //     // remove last bracket when closing bracket encountered
+            //     if ( [')', ']', '}'].includes(token) ) {
+            //         brackets[ENDERS[token]].pop()
+            //     } else {
+            //         brackets[token].push(b.index)
+            //     }
+            // }
+
+            // // Get last unclosed bracket (closest to the selection)
+            // ['(', '[', '{'].forEach(t => {
+            //     const lastIndex = brackets[t].length ? brackets[t].length - 1 : 0
+
+            //     if (last === undefined || (brackets[t].length && last < brackets[t][lastIndex])) {
+            //         last = brackets[t][lastIndex]
+            //         openPos = brackets[t][lastIndex]
+            //         bracketType = t
+            //     }
+            // })
+
+            if (openPos === undefined) return;
+
+            let j = 0;
+            let eOff = 0;
+            const pairs = []
+
+            const B_PAIRS = {
+                '(': '()',
+                '[': '[]',
+                '{': '{}',
+            }
+
+            while (j < tokenizedAfterText.length) {
+                const content = tokenizedAfterText[j].content
+                const punct = tokenizedAfterText[j].type === 'punctuation' && B_PAIRS[bracketType].indexOf(content) >= 0
+
+                if (punct) {
+                    if ([')', ']', '}'].includes(content) && !pairs.length ) {
+                        closePos = eOff
+                        break;
+                    }
+
+                    if ([')', ']', '}'].includes(content) && pairs.length ) {
+                        pairs.pop()
+                    }
+
+                    if (['(', '[', '{'].includes(content)) {
+                        pairs.push(content)
+                    }
+                }
+
+                eOff += tokenizedAfterText[j].length
+                j++;
+            }
+
+            // Parse closing bracket
+            // const endingRes = {
+            //     '(': /[\(\)]/g,
+            //     '[': /[\[\]]/g,
+            //     '{': /[\{\}]/g,
+            // }
+            // const pairs = []
+
+            // // Get first closing bracket of given type
+            // while ((b = endingRes[bracketType].exec(afterText)) !== null) {
+            //     const token = b[0]
+
+            //     if (bracketType === token) {
+            //         pairs.push(b.index)
+            //     } else {
+            //         if (pairs.length === 0) {
+            //             closePos = b.index;
+            //             break;
+            //         }
+
+            //         pairs.pop()
+            //     }
+            // }
 
             if (closePos === undefined) return;
 
             return {
-                startPos: getOpenPosition(openPos),
-                endPos: getClosePosition(s, closePos),
+                startPos: getOpenPosition(beforeRangeEnd, openPos),
+                endPos: getClosePosition(afterRangeStart, closePos),
                 tokenType: bracketType,
                 originalSelection: s,
             }
@@ -179,7 +319,7 @@ function activate(context) {
 
                 if (target !== undefined) {
                     if (target.length !== 2 || target.length !== 0 || typeof target !== string) {
-                        new Error ('Target must by string of length 2 for token replacment or empty string for token deletion')
+                        new Error ('Target must be string of length 2 for token replacment or empty string for token deletion')
                     }
 
                     if (target.length === 0) {
@@ -210,17 +350,18 @@ function activate(context) {
         return new vscode.Selection(p, end_pos)
       }
 
-    function getOpenPosition(offset) {
-        const editor = vscode.window.activeTextEditor;
-
-        return editor.document.positionAt(offset)
-    }
-
-    function getClosePosition(selection, offset) {
+    function getOpenPosition(start, offset) {
         const editor = vscode.window.activeTextEditor;
         const d = editor.document
 
-        return d.positionAt(d.offsetAt(selection.end) + offset)
+        return d.positionAt(d.offsetAt(start) - offset)
+    }
+
+    function getClosePosition(end, offset) {
+        const editor = vscode.window.activeTextEditor;
+        const d = editor.document
+
+        return d.positionAt(d.offsetAt(end) + offset)
     }
 }
 
