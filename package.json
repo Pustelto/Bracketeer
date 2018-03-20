@@ -21,8 +21,8 @@
     ],
     "icon": "images/bracketeer_logo.png",
     "galleryBanner": {
-        "color": "#2386CF",
-        "theme": "dark"
+        "color": "#F9F9F9",
+        "theme": "light"
     },
     "activationEvents": [
         "onCommand:bracketeer.swapBrackets",
