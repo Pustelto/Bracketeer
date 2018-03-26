@@ -29,7 +29,8 @@
         "onCommand:bracketeer.swapBrackets",
         "onCommand:bracketeer.changeBracketsTo",
         "onCommand:bracketeer.removeBrackets",
-        "onCommand:bracketeer.selectBracketContent"
+        "onCommand:bracketeer.selectBracketContent",
+        "onCommand:bracketeer.swapQuotes"
     ],
     "main": "./extension",
     "contributes": {
@@ -53,6 +54,11 @@
                 "command": "bracketeer.selectBracketContent",
                 "key": "Shift+Ctrl+Alt+h",
                 "mac": "Shift+Cmd+Alt+h"
+            },
+            {
+                "command": "bracketeer.swapQuotes",
+                "key": "Shift+Ctrl+Alt+!",
+                "mac": "Shift+Cmd+Alt+!"
             }
         ],
         "commands": [
@@ -74,6 +80,11 @@
             {
                 "command": "bracketeer.selectBracketContent",
                 "title": "Select bracket content",
+                "category": "Bracketeer"
+            },
+            {
+                "command": "bracketeer.swapQuotes",
+                "title": "Swap quotes",
                 "category": "Bracketeer"
             }
         ]
