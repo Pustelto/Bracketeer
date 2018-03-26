@@ -54,6 +54,11 @@ function activate(context) {
         'bracketeer.swapQuotes', () => replaceTokens(parseQuotes(LINE_TOLERANCE))
     ));
 
+    context.subscriptions.push(vscode.commands.registerCommand(
+        'bracketeer.removeQuotes', () => replaceTokens(parseQuotes(LINE_TOLERANCE), '')
+    ));
+
+
     /*
         CORE FUNCTIONALITY
      */
