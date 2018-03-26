@@ -3,6 +3,8 @@ const Prism = require('prismjs');
 const languages = require('prism-languages');
 
 function activate(context) {
+    const LINE_TOLERANCE = 8
+
     /*
         COMMANDS DEFINITIONS
      */
@@ -48,6 +50,10 @@ function activate(context) {
         }
     ));
 
+    context.subscriptions.push(vscode.commands.registerCommand(
+        'bracketeer.swapQuotes', () => replaceTokens(parseQuotes(LINE_TOLERANCE))
+    ));
+
     /*
         CORE FUNCTIONALITY
      */
@@ -57,44 +63,6 @@ function activate(context) {
         const editor = vscode.window.activeTextEditor;
         const languageId = editor.document.languageId;
         const selections = editor.selections;
-
-        const bracketsRe = /[\(\)\[\]\{\}]/g;
-
-        /*
-        - zjistím pozici počátku slova na počátku selekce a z této pozice udělám split na before/afterText
-        - parsování stringů bude podobné jako u brackets (zvážit nahrazení pouze internals současné parseBrackets funkce)
-        - od počátku slova zjistím, zda je před kurzorem string - pokud je před kurzorem celý string, je dost možné, že za kurzorem je kromě pokračování kurzu konec stringu (např závorky) a toto se teď snžím zkonvertovat na string - pokud na kurzor vložím uvozovky, je to v cajku, ale nevím jaké.
-
-        otestovat parsing na nějakém větším template literalu
-
-        PROBLÉM BUDOU STRINGY - POKUD MÁM KURZOR UPROSTŘED STRINGU TAK MI TO STRING SPLITNE A PŘESTANO HO TO BRÁT JAKO STRING
-            - BUĎ PARSOVAT CELÝ DOKUMENT (FUJ) NEBO TO ZKUSIT NĚJAK NARAFIČIT - PŘIDAT SPRÁVNOU UVOZOVKU DO ZBYTKU STRINGU A PAK S NÍ NEPOČÍTAT?
-            - pokud budu mít v parsingu správně string objekt, tak mi úprava úvozovek vrátí undefined, nutno ošetřit
-
-        - délka stringu je i s uvozovkami
-
-        42:Object
-            type:"string"
-            content:"'}'"
-            length:3
-            greedy:true
-        33:Object
-            type:"template-string"
-            content:Array[1]
-                0:Object
-                    type:"string"
-                    content:"`Target must by string' of length 2 for token replacment or empty string for token deletion`"
-                    length:92
-                    greedy:false
-            length:92
-            greedy:true
-        84:Object
-            type:"punctuation"
-            content:"}"
-            length:1
-            greedy:false
-            */
-
 
         // TODO: arrow function replace with separate function which can be tested - pure f.
         const allResults = selections.map(s => {
@@ -107,7 +75,6 @@ function activate(context) {
             // We use javascript as default lang if parsed doc is not in language defined in Prism
             const getParseLanguage = langId => Prism.languages[langId] || Prism.languages['javascript']
             const getLastFromArray = (arr) => arr[arr.length - 1]
-            const isStringToken = (token) => token.type === 'string' || typeof token === 'string'
             // pos is either 'start' or 'end'
             const getRangePosition = (selection, pos) =>
                 editor.document.getWordRangeAtPosition(s[pos])
@@ -133,15 +100,6 @@ function activate(context) {
             // ... and use them to get correcponding texts
             const beforeText = editor.document.getText(beforeRange);
             const afterText = editor.document.getText(afterRange);
-
-            // get type of quote
-            // const quoteType = beforeTok[beforeTok.length - 1].type === 'string' || typeof beforeTok[beforeTok.length - 1] === 'string' ? beforeTok[beforeTok.length - 1].content[0] : ''
-
-            // Inserting quote is necessary for correct parsing, we then need to substract 1 from position.
-            // console.log(beforeTok[beforeTok.length - 1][0], beforeTok[beforeTok.length - 1][0] + afterText);
-            // console.log(quoteType, quoteType + afterText);
-            // code below handle quote addition for better string parsing
-            // const tokenizedAfterText = Prism.tokenize(tokenizedBeforeText[tokenizedBeforeText.length - 1][0] + afterText, getParseLanguage(languageId))
 
             const tokenizedBeforeText = Prism.tokenize(beforeText, getParseLanguage(languageId))
             const tokenizedAfterText = Prism.tokenize(afterText, getParseLanguage(languageId))
@@ -240,6 +198,112 @@ function activate(context) {
         }
     }
 
+    // Default lineTolerance must be as big as possible in order to trigger parsing entire document as a fallback and Infinity returned null for some reason.
+    function parseQuotes(lineTolerance = Number.MAX_VALUE) {
+        if (!vscode.window.activeTextEditor) return;
+
+        const editor = vscode.window.activeTextEditor;
+        const languageId = editor.document.languageId;
+        const selections = editor.selections;
+        const doc = editor.document;
+
+        const allResults = selections.map(s => {
+            const texts = [];
+
+            // HELPERS
+            // We use javascript as default lang if parsed doc is not in language defined in Prism
+            const getParseLanguage = langId =>
+                Prism.languages[langId] || Prism.languages['javascript']
+            const isStringToken = (token) => token.type === 'template-string' || token.type === 'string'
+            const tokenAtCursorPos = (token, offset, startOffset, cursorOffset) => {
+                // If startOffset + offset is same as cursor - quotes are selected as well and we shouldn't do a quotes swap
+                return token.length + offset + startOffset >= cursorOffset &&
+                    offset + startOffset !== cursorOffset
+            }
+
+            const getFragmentRange = (lineOffset, selection, doc) => {
+                const { lineCount, lineAt } = doc
+                const range = []
+
+                let startLine, endLine, endChar
+
+                startLine = selection.start.line >= lineOffset
+                    ? selection.start.line - lineOffset
+                    : 0
+
+                endLine = selection.end.line + lineOffset <= lineCount
+                ? selection.end.line + lineOffset
+                : lineCount - 1 // lines are indexed from 0
+
+                endChar = lineAt(lineCount - 1).text.length
+
+                range.push(selection.start.with(startLine, 0))
+                range.push(selection.end.with(endLine, endChar))
+
+                return range
+            }
+
+            const [fragmentStartPos, fragmentEndPos] = getFragmentRange(lineTolerance, s, doc)
+
+            const cursorOffset = editor.document.offsetAt(s.start)
+            const fragmentOffset = editor.document.offsetAt(fragmentStartPos)
+
+            const fragmentText = editor.document.getText(new vscode.Range(fragmentStartPos, fragmentEndPos))
+
+            const tokens = Prism.tokenize(fragmentText, getParseLanguage(languageId))
+
+            let i = 0
+            let offset = 0
+            let startPos, endPos, tokenType
+
+            while (i < tokens.length) {
+                const tokenAtCursor = tokenAtCursorPos(
+                    tokens[i], offset, fragmentOffset, cursorOffset
+                )
+
+                if (tokenAtCursor) {
+                    if (isStringToken(tokens[i])) {
+                        startPos = editor.document.positionAt(offset + fragmentOffset)
+                        endPos = editor.document.positionAt(offset + fragmentOffset + tokens[i].length - 1)
+                        tokenType = tokens[i].type === 'template-string' ? '`' : tokens[i].content[0]
+                    }
+
+                    break;
+                }
+
+                offset += tokens[i].length
+                i++
+            }
+
+            if (!startPos) return;
+
+            return {
+                startPos,
+                endPos,
+                tokenType,
+                originalSelection: s,
+            }
+
+        })
+
+        const goodResults = allResults.filter(Boolean)
+
+        /*
+         * If parsing return no result for fragment of the file, parse again entire file.
+         * This is fail safe for parsing long multiline strings.
+         */
+        if (!goodResults.length && lineTolerance < Number.MAX_VALUE) {
+            return parseQuotes()
+        }
+
+        if (goodResults.length > 0) {
+            return goodResults
+        } else {
+            vscode.window.showInformationMessage('No quotes to modify found.')
+            return []
+        }
+    }
+
     function contentSelection(startPos, endPos, originalSelection) {
         const {start, end} = originalSelection
         const selStart = new vscode.Position(startPos.line, startPos.character + 1)
@@ -272,8 +336,14 @@ function activate(context) {
                         e = target[1]
                     }
                 } else {
-                    o = tokenType === '(' ? '[' : tokenType === '[' ? '{' : '('
-                    e = tokenType === '(' ? ']' : tokenType === '[' ? '}' : ')'
+                    // TODO: this must be done universaly in order to allow future extensions
+                    if ('([{'.indexOf(tokenType) >= 0) {
+                        o = tokenType === '(' ? '[' : tokenType === '[' ? '{' : '('
+                        e = tokenType === '(' ? ']' : tokenType === '[' ? '}' : ')'
+                    } else {
+                        o = tokenType === "'" ? '"' : tokenType === '"' ? '`' : "'"
+                        e = o
+                    }
                 }
 
                 edit.replace(charRange(startPos), o)
