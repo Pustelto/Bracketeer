@@ -58,6 +58,28 @@ function activate(context) {
         'bracketeer.removeQuotes', () => replaceTokens(parseQuotes(LINE_TOLERANCE), '')
     ));
 
+    context.subscriptions.push(vscode.commands.registerCommand(
+        'bracketeer.changeQuotesTo', async () => {
+            const MENU_ITEMS = [
+                {label: "'", description: 'Change to single quotes'},
+                {label: '"', description: 'Change to double quotes'},
+                {label: '`', description: 'Change to backticks'},
+            ]
+
+            const option = await vscode.window.showQuickPick(
+                MENU_ITEMS,
+                {
+                    matchOnDescription: true,
+                    placeHolder: 'Select quotes type you want to switch to...'
+                }
+            )
+
+            // End function if there was no item selected from menu
+            if (!option) return;
+
+            replaceTokens(parseQuotes(), option.label)
+        }
+    ));
 
     /*
         CORE FUNCTIONALITY
@@ -338,7 +360,7 @@ function activate(context) {
                         e = ''
                     } else {
                         o = target[0]
-                        e = target[1]
+                        e = target[1] || target[0]
                     }
                 } else {
                     // TODO: this must be done universaly in order to allow future extensions
