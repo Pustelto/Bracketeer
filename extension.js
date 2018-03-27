@@ -77,7 +77,18 @@ function activate(context) {
             // End function if there was no item selected from menu
             if (!option) return;
 
-            replaceTokens(parseQuotes(), option.label)
+            replaceTokens(parseQuotes(LINE_TOLERANCE), option.label)
+        }
+    ));
+
+    context.subscriptions.push(vscode.commands.registerCommand(
+        'bracketeer.selectQuotesContent', () => {
+            const editor = vscode.window.activeTextEditor;
+            const quotes = parseQuotes(LINE_TOLERANCE)
+
+            editor.selections = quotes.map(({startPos, endPos, originalSelection}) =>
+                contentSelection(startPos, endPos, originalSelection)
+            )
         }
     ));
 

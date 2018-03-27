@@ -72,6 +72,11 @@
                 "command": "bracketeer.removeQuotes",
                 "key": "Shift+Ctrl+Alt+'",
                 "mac": "Shift+Cmd+Alt+'"
+            },
+            {
+                "command": "bracketeer.selectQuotesContent",
+                "key": "Shift+Ctrl+Alt+¨",
+                "mac": "Shift+Cmd+Alt+¨"
             }
         ],
         "commands": [
@@ -108,6 +113,11 @@
             {
                 "command": "bracketeer.removeQuotes",
                 "title": "Remove quotes",
+                "category": "Bracketeer"
+            },
+            {
+                "command": "bracketeer.selectQuotesContent",
+                "title": "Select quotes content",
                 "category": "Bracketeer"
             }
         ]
