@@ -1,8 +1,8 @@
 {
     "name": "bracketeer",
     "displayName": "Bracketeer",
-    "description": "Easy manipulation with brackets",
-    "version": "1.0.0",
+    "description": "Easy manipulation with brackets and quotes",
+    "version": "1.1.0",
     "publisher": "pustelto",
     "homepage": "https://github.com/Pustelto/Bracketeer/blob/master/README.md",
     "repository": {
@@ -18,7 +18,8 @@
     ],
     "keywords": [
         "Brackets",
-        "Parentheses"
+        "Parentheses",
+        "Quotes"
     ],
     "icon": "images/bracketeer_logo.png",
     "galleryBanner": {
