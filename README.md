@@ -17,7 +17,7 @@ Bracketeer currently provide four commands to manipulate with brackets and their
 _Swap brackets_: `Shift+Cmd+Alt+K`
 _Replace brackets with..._: `Shift+Cmd+Alt+U`
 
-This command alow you to switch to different bracket types from within the brackets without need to select them. You can either cycle through them or use Quick pick menu to select correct bracket immediately.
+This command allows you to switch to different bracket types from within the brackets without need to select them. You can either cycle through them or use Quick pick menu to select correct bracket immediately.
 
 ![Swap brackets](images/bracket_swap_single.gif)
 ![Swap brackets with multiple cursors](images/bracket_swap_multi.gif)
@@ -46,7 +46,7 @@ With the help of this command you can easily select content of the brackets, Cal
 _Swap quotes_: `Shift+Cmd+Alt+;`
 _Replace quotes with..._: not assigned by default
 
-This command alow you to switch to different quote types from within the quotes without need to select them. You can either cycle through them or use Quick pick menu to select correct quote type immediately.
+This command allows you to switch to different quote types from within the quotes without need to select them. You can either cycle through them or use Quick pick menu to select correct quote type immediately.
 
 ![Swap quotes](images/quotes_swap.gif)
 ![Change quotes to specific type](images/quotes_chageto.gif)
@@ -63,7 +63,7 @@ This command will delete enclosing quotes
 
 Keyboard shortcut: `Shift+Cmd+Alt+¨`
 
-With the help of this command you can easily select content of the quotes, Calling this command again will select quotes as well. Unlike bracket alternative, selection won't expand more after selection fo the quotes.
+With the help of this command you can easily select content of the quotes, Calling this command again will select quotes as well. Unlike bracket alternative, selection won't expand more after selection of the quotes.
 
 ![Select quotes content](images/quotes_select.gif)
 
@@ -71,7 +71,7 @@ With the help of this command you can easily select content of the quotes, Calli
 ## Known Issues
 
 - In case of switching quotes from multiline template literal to simple string the result will be invalid string (especially with variable interpolation). So the next quotes switching won't work and Bracketeer will fail. There is not an easy way how to fix it. So please keep that in mind.
-- When parsing quotes there may be some edge cases in string heavy documents with long multiline string when wrong quotes will be parsed. I plan to look into it and find a way how to minimaze or remove this issue.
+- When parsing quotes there may be some edge cases in string heavy documents with long multiline string when wrong quotes will be parsed. I plan to look into it and find a way how to minimize or remove this issue.
 
 
 ## Road map
