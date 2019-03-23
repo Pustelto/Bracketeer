@@ -10,5 +10,23 @@
     "brackets": ["[]", "{}"],
     "string_tokens": ["string", "property"],
     "bracket_tokens": ["punctuation"]
+  },
+  "css": {
+    "quotes": ["\"", "'"],
+    "brackets": ["()", "{}"],
+    "string_tokens": ["string"],
+    "bracket_tokens": ["punctuation"]
+  },
+  "python": {
+    "quotes": ["\"", "'"],
+    "brackets": ["()", "{}"],
+    "string_tokens": ["string"],
+    "bracket_tokens": ["punctuation"]
+  },
+  "powershell": {
+    "quotes": ["\"", "'"],
+    "brackets": ["()", "{}"],
+    "string_tokens": ["string"],
+    "bracket_tokens": ["punctuation"]
   }
 }

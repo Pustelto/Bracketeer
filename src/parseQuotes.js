@@ -68,8 +68,9 @@ function parseQuotes(lineTolerance = Number.MAX_VALUE) {
                     if (isStringToken(tokens[i], languageDef)) {
                         startPos = editor.document.positionAt(offset + fragmentOffset)
                         endPos = editor.document.positionAt(offset + fragmentOffset + tokens[i].length - 1)
-                        // TODO: this should be handled by language definition somehow
-                        tokenType = tokens[i].type === 'template-string' ? '`' : tokens[i].content[0]
+                        // TODO: this should be handled by language definition somehow, eg. powershell returns string as array, JS use backticks for template-string
+                        tokenType = tokens[i].type === 'template-string' ? '`' : Array.isArray(tokens[i].content) ? tokens[i].content[0][0] : tokens[i].content[0]
+
                     }
 
                     break;
