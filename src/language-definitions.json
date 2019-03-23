@@ -1,0 +1,14 @@
+{
+  "javascript": {
+    "quotes": ["'", "\"", "`"],
+    "brackets": ["()", "[]", "{}"],
+    "string_tokens": ["string", "template-string"],
+    "bracket_tokens": ["punctuation"]
+  },
+  "json": {
+    "quotes": ["\""],
+    "brackets": ["[]", "{}"],
+    "string_tokens": ["string", "property"],
+    "bracket_tokens": ["punctuation"]
+  }
+}
