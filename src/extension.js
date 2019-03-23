@@ -14,11 +14,11 @@ function activate(context) {
         COMMANDS DEFINITIONS
      */
     context.subscriptions.push(vscode.commands.registerCommand(
-        'bracketeer.swapBrackets', () => replaceTokens(parseBrackets())
+        'bracketeer.swapBrackets', () => replaceTokens(parseBrackets(), 'brackets')
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
-        'bracketeer.removeBrackets', () => replaceTokens(parseBrackets(), '')
+        'bracketeer.removeBrackets', () => replaceTokens(parseBrackets(), 'brackets', '')
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -40,7 +40,7 @@ function activate(context) {
             // End function if there was no item selected from menu
             if (!option) return;
 
-            replaceTokens(parseBrackets(), option.label)
+            replaceTokens(parseBrackets(), 'brackets', option.label)
         }
     ));
 
@@ -49,6 +49,8 @@ function activate(context) {
             const editor = vscode.window.activeTextEditor;
             const brackets = parseBrackets()
 
+            if (!brackets.length) return;
+
             editor.selections = brackets.map(({startPos, endPos, originalSelection}) =>
                 contentSelection(startPos, endPos, originalSelection)
             )
@@ -56,11 +58,11 @@ function activate(context) {
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
-        'bracketeer.swapQuotes', () => replaceTokens(parseQuotes(LINE_TOLERANCE))
+        'bracketeer.swapQuotes', () => replaceTokens(parseQuotes(LINE_TOLERANCE), 'quotes')
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
-        'bracketeer.removeQuotes', () => replaceTokens(parseQuotes(LINE_TOLERANCE), '')
+        'bracketeer.removeQuotes', () => replaceTokens(parseQuotes(LINE_TOLERANCE), 'quotes', '')
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -82,7 +84,7 @@ function activate(context) {
             // End function if there was no item selected from menu
             if (!option) return;
 
-            replaceTokens(parseQuotes(LINE_TOLERANCE), option.label)
+            replaceTokens(parseQuotes(LINE_TOLERANCE), 'quotes', option.label)
         }
     ));
 
@@ -90,6 +92,8 @@ function activate(context) {
         'bracketeer.selectQuotesContent', () => {
             const editor = vscode.window.activeTextEditor;
             const quotes = parseQuotes(LINE_TOLERANCE)
+
+            if (!quotes.length) return;
 
             editor.selections = quotes.map(({startPos, endPos, originalSelection}) =>
                 contentSelection(startPos, endPos, originalSelection)
