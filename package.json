@@ -36,7 +36,7 @@
         "onCommand:bracketeer.removeQuotes",
         "onCommand:bracketeer.selectQuotesContent"
     ],
-    "main": "./extension",
+    "main": "./src/extension",
     "contributes": {
         "keybindings": [
             {
@@ -76,8 +76,8 @@
             },
             {
                 "command": "bracketeer.selectQuotesContent",
-                "key": "Shift+Ctrl+Alt+¨",
-                "mac": "Shift+Cmd+Alt+¨"
+                "key": "Shift+Ctrl+Alt+0",
+                "mac": "Shift+Cmd+Alt+0"
             }
         ],
         "commands": [

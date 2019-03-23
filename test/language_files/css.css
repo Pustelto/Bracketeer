@@ -1,0 +1,14 @@
+.bg--dark {
+  --primary-text: var(--white);
+  --secondary-text: var(--mid-gray);
+  background-color: var(--black) !important;
+}
+
+.bg--orange {
+  --primary-text: var(--white);
+  --secondary-text: hsl(9, 27%, 92%);
+  background-image: url('/static/images/orange-bg-shape.png'), linear-gradient(#fba86f, #ff5653) !important;
+  background-position: right 0%, center;
+  background-size: 70rem, 100%;
+  background-repeat: no-repeat;
+}
