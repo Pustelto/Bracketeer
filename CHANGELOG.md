@@ -3,6 +3,13 @@ All notable changes to the "bracketeer" extension will be documented in this fil
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 1.2.0
+### Added
+- support for json, python, css and powershell languages
+
+### Changed
+- refactor internals to allow easy addition of support for more languages
+
 ## 1.1.0
 ### Added
 - __NEW FEATURE:__ Quotes actions - change, remove and select quotes as well
