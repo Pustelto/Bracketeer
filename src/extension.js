@@ -2,11 +2,16 @@ const vscode = require('vscode');
 const parseBrackets = require('./parseBrackets');
 const parseQuotes = require('./parseQuotes');
 const {
+    changeQuotesTo,
+    LINE_TOLERANCE,
+} = require('./quotes');
+const {
+    changeBracketsTo,
+} = require('./bracketsSelect');
+const {
     contentSelection,
     replaceTokens,
 } = require('./helpers');
-
-const LINE_TOLERANCE = 8
 
 function activate(context) {
 
@@ -22,26 +27,7 @@ function activate(context) {
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
-        'bracketeer.changeBracketsTo', async () => {
-            const MENU_ITEMS = [
-                {label: '()', description: 'Change to parenthesis'},
-                {label: '[]', description: 'Change to square brackets'},
-                {label: '{}', description: 'Change to curly brackets'},
-            ]
-
-            const option = await vscode.window.showQuickPick(
-                MENU_ITEMS,
-                {
-                    matchOnDescription: true,
-                    placeHolder: 'Select bracket type you want to switch to...'
-                }
-            )
-
-            // End function if there was no item selected from menu
-            if (!option) return;
-
-            replaceTokens(parseBrackets(), 'brackets', option.label)
-        }
+        'bracketeer.changeBracketsTo', changeBracketsTo
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -66,26 +52,7 @@ function activate(context) {
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
-        'bracketeer.changeQuotesTo', async () => {
-            const MENU_ITEMS = [
-                {label: "'", description: 'Change to single quotes'},
-                {label: '"', description: 'Change to double quotes'},
-                {label: '`', description: 'Change to backticks'},
-            ]
-
-            const option = await vscode.window.showQuickPick(
-                MENU_ITEMS,
-                {
-                    matchOnDescription: true,
-                    placeHolder: 'Select quotes type you want to switch to...'
-                }
-            )
-
-            // End function if there was no item selected from menu
-            if (!option) return;
-
-            replaceTokens(parseQuotes(LINE_TOLERANCE), 'quotes', option.label)
-        }
+        'bracketeer.changeQuotesTo', changeQuotesTo
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand(
