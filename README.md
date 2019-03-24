@@ -68,20 +68,30 @@ With the help of this command you can easily select content of the quotes, Calli
 ![Select quotes content](images/quotes_select.gif)
 
 
-## Known Issues
+## How does it work
 
+Since VS Code does not provide extension API for working with language (grammar) tokens. In order to make this extension I'm using [Prism.js](https://prismjs.com/) to parse the documents. This has some edge cases but mostly work pretty well. This extension have `language-definitions.json` file which contains brackets/quotes sets for given language and token types used to identify brackets/quotes in text (by Prism). For more detail have a look into source code. This file contains only small set of languages I'm using. If there is not language definition for your language of choice extension will default to JS (it works... usually).
+
+If your language of choice is missing in definitions file and you would like to contribute please feel free to submit a PR. But test first that it is working, I will test it myself as well before merging.
+
+### Known Issues
+
+- HTML tokens parsed by Prism have nested tokens inside of them. Bracketeer can't handle it at the moment. So do not expect it to work here.
 - In case of switching quotes from multiline template literal to simple string the result will be invalid string (especially with variable interpolation). So the next quotes switching won't work and Bracketeer will fail. There is not an easy way how to fix it. So please keep that in mind.
 - When parsing quotes there may be some edge cases in string heavy documents with long multiline string when wrong quotes will be parsed. I plan to look into it and find a way how to minimize or remove this issue.
 
 
 ## Road map
 
+In no particular order:
+
 - Selection from cursor to opening/closing bracket/quote
+- Tests - yeah, don't have one yet (shame). And current refactoring was a hell sometimes. Seriously people write tests.
 - Cursor navigation to opening/closing brackets/quotes
-- Language specific settings for bracket/quotes types available for swapping
-- Add Flowtype support, code polishing, better build flow
+- Migrate to TS (once we have test)
+- Support for HTML (not working now)
+- Make it work in comments as well (I have some idea, just need to experimetn a bit)
 - Add settings to specify how large line offset should be used for quotes parsing (default is 8)
-- Refactor token cycling - it is just a bunch of ifs now, it should be universal function for easy extensibility
 
 
 ## Release Notes
