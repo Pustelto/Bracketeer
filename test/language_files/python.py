@@ -8,3 +8,5 @@ class PartnerRelationshipForm(forms.ModelForm):
     self.fields['partner_class'].queryset = PartnerClass.objects.filter(event=self.instance.event)
     # TODO - show partner name instead of ID -> somehow make PartnerWidget work
     self.fields['partner'].widget = TextInput(attrs={'readonly': 'readonly'})
+
+[1 for x in a]

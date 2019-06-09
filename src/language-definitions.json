@@ -19,7 +19,7 @@
   },
   "python": {
     "quotes": ["\"", "'"],
-    "brackets": ["()", "{}"],
+    "brackets": ["()", "[]", "{}"],
     "string_tokens": ["string"],
     "bracket_tokens": ["punctuation"]
   },
