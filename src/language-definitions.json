@@ -28,5 +28,11 @@
     "brackets": ["()", "{}"],
     "string_tokens": ["string"],
     "bracket_tokens": ["punctuation"]
+  },
+  "html": {
+    "quotes": ["\"", "'"],
+    "brackets": [],
+    "string_tokens": [],
+    "bracket_tokens": []
   }
 }

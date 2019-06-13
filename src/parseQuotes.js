@@ -65,12 +65,39 @@ function parseQuotes(lineTolerance = Number.MAX_VALUE) {
                 )
 
                 if (tokenAtCursor) {
-                    if (isStringToken(tokens[i], languageDef)) {
-                        startPos = editor.document.positionAt(offset + fragmentOffset)
-                        endPos = editor.document.positionAt(offset + fragmentOffset + tokens[i].length - 1)
-                        // TODO: this should be handled by language definition somehow, eg. powershell returns string as array, JS use backticks for template-string
-                        tokenType = tokens[i].type === 'template-string' ? '`' : Array.isArray(tokens[i].content) ? tokens[i].content[0][0] : tokens[i].content[0]
+                    // Parse html
+                    if (languageId === 'html' && tokens[i].type === 'tag') {
+                        const tag = tokens[i].content
+                        let tagOffset = 0
+                        let j = 0
 
+                        // search nested tokens until we reach cursor position
+                        while (cursorOffset > offset + fragmentOffset + tagOffset) {
+                            // we are looking for `attr-value` type and for such whose length
+                            // will be bigger than cursor offset. This way we will know that this
+                            // is correct token (in case html token has more attributes)
+                            const overlapsWithCursor = tag[j].length + offset + fragmentOffset + tagOffset > cursorOffset
+
+                            if (tag[j].type === 'attr-value' && overlapsWithCursor) {
+                                tagOffset += 1 // for = token which is part of attr-value
+
+                                startPos = editor.document.positionAt(offset + fragmentOffset + tagOffset)
+                                endPos = editor.document.positionAt(offset + fragmentOffset + tagOffset + tag[j].content[2].length + 1 )
+                                tokenType = tag[j].content[1].content
+
+                                break;
+                            }
+                            tagOffset +=tag[j].length
+                            j +=1
+                        }
+                    } else {
+                        // Parse other languages
+                        if (isStringToken(tokens[i], languageDef)) {
+                            startPos = editor.document.positionAt(offset + fragmentOffset)
+                            endPos = editor.document.positionAt(offset + fragmentOffset + tokens[i].length - 1)
+                            // TODO: this should be handled by language definition somehow, eg. powershell returns string as array, JS use backticks for template-string
+                            tokenType = tokens[i].type === 'template-string' ? '`' : Array.isArray(tokens[i].content) ? tokens[i].content[0][0] : tokens[i].content[0]
+                        }
                     }
 
                     break;
