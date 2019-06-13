@@ -3,6 +3,24 @@ All notable changes to the "bracketeer" extension will be documented in this fil
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 1.2.3
+### Added
+- quote parsing support for HTML
+
+### Changes
+- improve bracket parsing to avoid some edge cases when it didn't worked
+
+## 1.2.2
+### Internal
+- remove console.log from production build
+
+### Changed
+- refactor internals to allow easy addition of support for more languages
+
+## 1.2.1
+### Added
+- square bracketes support for python
+
 ## 1.2.0
 ### Added
 - support for json, python, css and powershell languages
