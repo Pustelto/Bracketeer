@@ -48,6 +48,7 @@ function parseBrackets() {
 
         const tokenizedBeforeText = Prism.tokenize(beforeText, prismLang)
         const tokenizedAfterText = Prism.tokenize(afterText, prismLang)
+console.log(tokenizedBeforeText, tokenizedAfterText);
 
         const [openPos, closePos, bracketType] = getBracketPairPositionsAndType(tokenizedBeforeText, tokenizedAfterText, languageDef)
 
