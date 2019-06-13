@@ -22,9 +22,6 @@ async function changeBracketsTo() {
 
   // End function if there was no item selected from menu
   if (!option) return;
-console.log('OPOPO', parseBrackets());
-console.log('RRRRR', replaceTokens);
-
   replaceTokens(parseBrackets(), 'brackets', option.label)
   replaceTokens(parseBrackets(), 'brackets', '')
 }
