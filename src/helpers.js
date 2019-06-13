@@ -93,7 +93,6 @@ function replaceTokens(selections, tokenFamily, target) {
 
                 // [ (), [], {}]
                 const startIndex = openingTokens.findIndex(oT => oT === tokenType)
-console.log(tokens, openingTokens, closingTokens, numOfTokens, tokenType);
 
                 if (startIndex === -1) {
                     vscode.window.showInformationMessage('Invalid token was parsed. Please try again or try another selection, cursor position.')
