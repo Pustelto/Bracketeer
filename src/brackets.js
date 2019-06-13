@@ -43,6 +43,7 @@ function getBracketPairPositionsAndType(tokenizedBeforeText, tokenizedAfterText,
       if (openingBrackets.includes(tokenContent) && !bracketsTracker[tokenContent].length ) {
         openPos = beforeOffset
         bracketType = tokenContent
+        console.log(openPos, bracketType);
         break;
       } else {
         openingBrackets.includes(tokenContent)
@@ -97,4 +98,30 @@ function getBracketPairPositionsAndType(tokenizedBeforeText, tokenizedAfterText,
   return [openPos, closePos, bracketType]
 }
 
+function getOffsetToFirstBracket(tokenizedBeforeText, languageDef) {
+  const { brackets } = languageDef
+  const openingBrackets = brackets.map(b => b[0])
+  const closingBrackets = brackets.map(b => b[1])
+  let bracketType, openPos, closePos
+  let i = tokenizedBeforeText.length - 1;
+  let numOfElements = 0
+  let beforeOffset = 0;
+
+  while (i >= 0) {
+    const tokenContent = tokenizedBeforeText[i].content
+    const isBracket = isBracketToken(tokenizedBeforeText[i].type, tokenContent, languageDef)
+
+    if (isBracket) {
+      break;
+    }
+
+    beforeOffset += tokenizedBeforeText[i].length;
+    numOfElements -= 1;
+    i--;
+  }
+
+  return {beforeOffset, numOfElements}
+}
+
 exports.getBracketPairPositionsAndType = getBracketPairPositionsAndType
+exports.getOffsetToFirstBracket = getOffsetToFirstBracket

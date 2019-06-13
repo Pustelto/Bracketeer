@@ -128,3 +128,31 @@ function getPositionFromOffset(position, offset, before = true) {
 }
 
 exports.getPositionFromOffset = getPositionFromOffset;
+
+function calculatePositionDeltas(originalPosition, charOffset) {
+    const editor = vscode.window.activeTextEditor;
+    const d = editor.document
+
+    let characterDelta = charOffset;
+    let lineDelta = 0;
+
+    if (originalPosition.character < characterDelta && characterDelta > 0) {
+      lineDelta -= 1;
+      characterDelta = characterDelta - originalPosition.character;
+
+      let line = d.lineAt(originalPosition.line + lineDelta);
+
+      while (line.text.length < characterDelta) {
+        lineDelta -= 1;
+        characterDelta = characterDelta - line.text.length;
+        line = d.lineAt(originalPosition.line + lineDelta);
+      }
+    }
+
+    return {
+        lineDelta,
+        characterDelta,
+    }
+}
+
+exports.calculatePositionDeltas = calculatePositionDeltas;
