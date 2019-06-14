@@ -3,6 +3,10 @@ All notable changes to the "bracketeer" extension will be documented in this fil
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 1.2.4
+### Hotfix
+- revert to 1.2.2 parsing of brackets due to error in parsing, need to investigate further
+
 ## 1.2.3
 ### Added
 - quote parsing support for HTML
