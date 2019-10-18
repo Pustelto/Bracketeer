@@ -61,7 +61,7 @@ This command will delete enclosing quotes
 
 #### Select quotes content
 
-Keyboard shortcut: `Shift+Cmd+Alt+¨`
+Keyboard shortcut: `Shift+Cmd+Alt+0`
 
 With the help of this command you can easily select content of the quotes, Calling this command again will select quotes as well. Unlike bracket alternative, selection won't expand more after selection of the quotes.
 
