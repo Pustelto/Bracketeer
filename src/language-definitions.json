@@ -1,4 +1,10 @@
 {
+  "php": {
+    "quotes": ["'", "\""],
+    "brackets": ["()", "[]", "{}"],
+    "string_tokens": ["string","single-quoted-string","double-quoted-string"],
+    "bracket_tokens": ["punctuation"]
+  },
   "javascript": {
     "quotes": ["'", "\"", "`"],
     "brackets": ["()", "[]", "{}"],
