@@ -4,11 +4,15 @@ All notable changes to the "bracketeer" extension will be documented in this fil
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## 1.2.6
+## 1.2.7
 
 ### Hotfix
 
 - fix bracket parsing broken by unmerged changes from 1.2.4
+
+## 1.2.6
+
+- wrong release (without changes)
 
 ## 1.2.5
 
