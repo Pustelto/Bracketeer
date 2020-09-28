@@ -121,6 +121,46 @@
         "title": "Select quotes content",
         "category": "Bracketeer"
       }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "bracketeer.brackets",
+          "group": "y_bracketeer",
+          "when": "editorIsOpen"
+        },
+        {
+          "submenu": "bracketeer.quotes",
+          "group": "y_bracketeer",
+          "when": "editorIsOpen"
+        }
+      ],
+      "bracketeer.brackets": [
+        {
+          "command": "bracketeer.changeBracketsTo"
+        },
+        {
+          "command": "bracketeer.removeBrackets"
+        }
+      ],
+      "bracketeer.quotes": [
+        {
+          "command": "bracketeer.changeQuotesTo"
+        },
+        {
+          "command": "bracketeer.removeQuotes"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "bracketeer.brackets",
+        "label": "Bracketeer Brackets"
+      },
+      {
+        "id": "bracketeer.quotes",
+        "label": "Bracketeer Quotes"
+      }
     ]
   },
   "scripts": {
