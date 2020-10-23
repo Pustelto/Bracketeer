@@ -1,4 +1,4 @@
-const { isBracketToken } = require("./helpers");
+const { isBracketToken, isClosingBracket } = require("./helpers");
 
 /* Method get opening bracket position START
 
@@ -84,18 +84,20 @@ function getBracketPairPositionsAndType(
 
   while (j < tokenizedAfterText.length) {
     const tokenContent = tokenizedAfterText[j].content;
-    const isCorrectBracketType =
-      tokenizedAfterText[j].type === "punctuation" &&
-      B_PAIRS[bracketType].indexOf(tokenContent) >= 0;
+    const isCorrectBracketType = isClosingBracket(
+      tokenizedAfterText[j].type,
+      tokenContent,
+      languageDef,
+      B_PAIRS,
+      bracketType
+    );
 
     if (isCorrectBracketType) {
       if (closingBrackets.includes(tokenContent) && !pairs.length) {
         closePos = afterOffset;
         break;
       } else {
-        closingBrackets.includes(tokenContent)
-          ? pairs.pop()
-          : pairs.push(tokenContent);
+        closingBrackets.includes(tokenContent) ? pairs.pop() : pairs.push(tokenContent);
       }
     }
 
