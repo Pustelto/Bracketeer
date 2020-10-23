@@ -2,7 +2,7 @@
   "php": {
     "quotes": ["'", "\""],
     "brackets": ["()", "[]", "{}"],
-    "string_tokens": ["string","single-quoted-string","double-quoted-string"],
+    "string_tokens": ["string", "single-quoted-string", "double-quoted-string"],
     "bracket_tokens": ["punctuation"]
   },
   "javascript": {
@@ -10,6 +10,18 @@
     "brackets": ["()", "[]", "{}"],
     "string_tokens": ["string", "template-string"],
     "bracket_tokens": ["punctuation"]
+  },
+  "typescript": {
+    "quotes": ["'", "\"", "`"],
+    "brackets": ["()", "[]", "{}", "<>"],
+    "string_tokens": ["string", "template-string"],
+    "bracket_tokens": ["punctuation", "operator"]
+  },
+  "typescriptreact": {
+    "quotes": ["'", "\"", "`"],
+    "brackets": ["()", "[]", "{}", "<>"],
+    "string_tokens": ["string", "template-string"],
+    "bracket_tokens": ["punctuation", "operator"]
   },
   "json": {
     "quotes": ["\""],
