@@ -52,5 +52,11 @@
     "brackets": [],
     "string_tokens": [],
     "bracket_tokens": []
+  },
+  "ruby": {
+    "quotes": ["\"", "'"],
+    "brackets": ["()", "[]", "{}"],
+    "string_tokens": ["string"],
+    "bracket_tokens": ["punctuation"]
   }
 }
