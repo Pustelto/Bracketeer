@@ -1,3 +1,33 @@
+# [1.3.0](https://github.com/Pustelto/Bracketeer/compare/v1.2.3...v1.3.0) (2020-10-25)
+
+
+### Bug Fixes
+
+* bracket parsing ([ac1446a](https://github.com/Pustelto/Bracketeer/commit/ac1446a473f9dbdd86a2ca3d0b8accef91398465))
+
+
+### Features
+
+* add better support for ruby ([4f9139a](https://github.com/Pustelto/Bracketeer/commit/4f9139a15f6a0701f1a5bd4ab1df46c490e22940))
+* Add commands to context menu. ([839ef5c](https://github.com/Pustelto/Bracketeer/commit/839ef5c6d2831937d0700c2fe19abf47aef7e6b4))
+* add menu config ([32f0d8b](https://github.com/Pustelto/Bracketeer/commit/32f0d8b6160a2d37ddb5ecf3d04991131501c897))
+* add support for angle brackets in TS files ([79e0f89](https://github.com/Pustelto/Bracketeer/commit/79e0f89e7627c8cef276723cc0c3f31f02dcd740))
+
+# [1.3.0](https://github.com/Pustelto/Bracketeer/compare/v1.2.3...v1.3.0) (2020-10-25)
+
+
+### Bug Fixes
+
+* bracket parsing ([ac1446a](https://github.com/Pustelto/Bracketeer/commit/ac1446a473f9dbdd86a2ca3d0b8accef91398465))
+
+
+### Features
+
+* add better support for ruby ([4f9139a](https://github.com/Pustelto/Bracketeer/commit/4f9139a15f6a0701f1a5bd4ab1df46c490e22940))
+* Add commands to context menu. ([839ef5c](https://github.com/Pustelto/Bracketeer/commit/839ef5c6d2831937d0700c2fe19abf47aef7e6b4))
+* add menu config ([32f0d8b](https://github.com/Pustelto/Bracketeer/commit/32f0d8b6160a2d37ddb5ecf3d04991131501c897))
+* add support for angle brackets in TS files ([79e0f89](https://github.com/Pustelto/Bracketeer/commit/79e0f89e7627c8cef276723cc0c3f31f02dcd740))
+
 # Change Log
 
 All notable changes to the "bracketeer" extension will be documented in this file.

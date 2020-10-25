@@ -2,6 +2,9 @@
 .vscode-test/**
 test/**
 .gitignore
-jsconfig.json
-vsc-extension-quickstart.md
 .eslintrc.json
+.husky/**
+jsconfig.json
+tsconfig.json
+vsc-extension-quickstart.md
+webpack.config.js
