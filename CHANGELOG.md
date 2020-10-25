@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/Pustelto/Bracketeer/compare/v1.3.0...v1.3.1) (2020-10-25)
+
+
+### Bug Fixes
+
+* bump vs code version in engines ([0deaa43](https://github.com/Pustelto/Bracketeer/commit/0deaa43fac8fd87475a49e2a344efc1255d0b784))
+
 # [1.3.0](https://github.com/Pustelto/Bracketeer/compare/v1.2.3...v1.3.0) (2020-10-25)
 
 
