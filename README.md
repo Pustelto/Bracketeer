@@ -1,5 +1,13 @@
 # Bracketeer
 
+**‼️ IMPORTANT INFO**
+
+**Unfortunately due to family reasons, I don't have time to maintain the extension and react to all the feedback in some reasonable time. The extension is stable and working, but there are bugs and edge cases I would like to address. If you want to help me with it, feel free to contact me. I don't plan to scratch the extension as I use it a lot myself. But I don't have the resources to move it forward and fix the bugs.**
+
+**Thanks for understanding**
+
+---
+
 Bracketeer gives you brackets and quotes superpowers at the tip of your fingers. Easily swap bracket/quote types, remove them or select their content from within with one command. No need to select content of the bracket/quote or move your cursor. Works even on multiple selections.
 
 Extension should work with different languages, but if you encounter error, please let know and I will try to fix it.
