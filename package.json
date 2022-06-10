@@ -196,7 +196,7 @@
     "babel-loader": "8.1.0",
     "eslint": "5.15.3",
     "husky": "5.0.0-beta.0",
-    "semantic-release": "17.2.1",
+    "semantic-release": "19.0.3",
     "semantic-release-vsce": "3.0.1",
     "typescript": "3.3.3",
     "vscode": "1.1.33",
